@@ -37,16 +37,6 @@ new CronJob('0 30 18 * * *', () => {
     })
 }, null, true, 'Asia/Jakarta')
 
-async function checkUser(id) {
-  let a = await axios.get(`${server}/users/one/${id}`)
-                  .then(response => {
-                    return true
-                  })
-                  .catch(err => {
-                    return false
-                  })
-}
-
 function downloadImage(img, reply, userId) {
   img.pipe(fs.createWriteStream('test.jpg'))
     .on('error', (err) => console.log(err))
@@ -74,26 +64,102 @@ function getText(reply, fileName, userId) {
 
         let hasil = []
 
-        splitted.forEach(split => {
+        splitted.forEach((split, index) => {
           if (split[0]) {
             let data = split.split(' ')
-
+            
             if (data[0] === 'Paha' || data[0] === 'paha' || data[0] === 'PAHA') {
-              let obj = {
-                itemName: data[0] + ' ' + data[1],
-                quantity: Number(data[2]),
-                Total: Number(data[3].split('.').join(''))
-              }
+              if (!Number(splitted[index + 1][0]) && index%2 === 1) {
+                if (splitted[index + 2][1] === ' ') {
+                  let obj = {
+                    itemName: splitted[0],
+                    quantity: Number(splitted[index + 2][0]),
+                    Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                  }
 
-              hasil.push(obj)
+                    hasil.push(obj)
+                  } else {
+                      let angka = splitted[index + 2][0] + splitted[index + 2][1]
+
+                      let obj = {
+                        itemName: splitted[0],
+                        quantity: Number(angka),
+                        Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                      }
+
+                      hasil.push(obj)
+                  }
+              } else if (Number(splitted[index + 1][0]) && index%2 === 0) {
+                  if (splitted[index + 1][1] === ' ') {
+                    let obj = {
+                      itemName: splitted[0],
+                      quantity: Number(splitted[index + 1][0]),
+                      Total: Number(splitted[index + 1].slice(2).split('.').join(''))
+                    }
+
+                    hasil.push(obj)
+                  } else {
+                      let angka = splitted[index + 1][0] + splitted[index +2][1]
+
+                      let obj = {
+                        itemName: splitted[0],
+                        quantity: Number(angka),
+                        Total: Number(splitted[index + 1].slice(3).split('.').join(''))
+                      }
+
+                      hasil.push(obj)
+                  }
+              } else {
+                  let obj = {
+                    itemName: data[0] + ' ' + data[1],
+                    quantity: Number(data[2]),
+                    Total: Number(data[3].split('.').join(''))
+                  }
+    
+                  hasil.push(obj)
+              }
             } else {
-              let obj = {
-                itemName: data[0],
-                quantity: Number(data[1]),
-                Total: Number(data[2].split('.').join(''))
-              }
+                if (!Number(splitted[index + 1][0]) && index%2 === 1) {
+                  if (splitted[index + 2][1] === ' ') {
+                    let obj = {
+                      itemName: splitted[0],
+                      quantity: Number(splitted[index + 2][0]),
+                      Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                    }
 
-              hasil.push(obj)
+                    hasil.push(obj)
+                  } else {
+                      let angka = splitted[index + 2][0] + splitted[index + 2][1]
+
+                      let obj = {
+                        itemName: splitted[0],
+                        quantity: Number(angka),
+                        Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                      }
+
+                      hasil.push(obj)
+                  }
+              } else {
+                  if (splitted[index + 1][1] === ' ') {
+                    let obj = {
+                      itemName: splitted[0],
+                      quantity: Number(splitted[index + 1][0]),
+                      Total: Number(splitted[index + 1].slice(2).split('.').join(''))
+                    }
+
+                    hasil.push(obj)
+                  } else {
+                      let angka = splitted[index + 1][0] + splitted[index +2][1]
+
+                      let obj = {
+                        itemName: splitted[0],
+                        quantity: Number(angka),
+                        Total: Number(splitted[index + 1].slice(3).split('.').join(''))
+                      }
+
+                      hasil.push(obj)
+                  }
+              }
             }
           }
          })
@@ -145,23 +211,25 @@ bot.help((ctx) => {
 bot.on('photo', ({message, reply}) => {
   let userId = message.from.id
 
-  if (checkUser(userId)) {
-    reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report....... ${emoji.get('oncoming_automobile')}`)
+  axios.get(`${server}/users/one/${userId}`)
+    .then(() => {
+      reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report....... ${emoji.get('oncoming_automobile')}`)
 
-    telegram.getFileLink(message.photo.pop().file_id)
-      .then(async (link) => {
-        let image = await axios.get(link, { responseType:"stream" })
-                      .then(data => {
-                        const img = data.data
-                        downloadImage(img, reply, userId)
-                      })
-      })
-      .catch(error => {
-        console.log(err)
-      })
-  } else {
-    reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
-  }
+      telegram.getFileLink(message.photo.pop().file_id)
+        .then(async (link) => {
+          let image = await axios.get(link, { responseType:"stream" })
+                        .then(data => {
+                          const img = data.data
+                          downloadImage(img, reply, userId)
+                        })
+        })
+        .catch(error => {
+          console.log(err)
+        })
+    })
+    .catch(err => {
+      reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
+    })
 })
 
 bot.command('myId', (ctx) => {
