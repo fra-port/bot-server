@@ -70,44 +70,64 @@ function getText(reply, fileName, userId) {
             
             if (data[0] === 'Paha' || data[0] === 'paha' || data[0] === 'PAHA') {
               if (!Number(splitted[index + 1][0]) && index%2 === 1) {
-                if (splitted[index + 2][1] === ' ') {
+                if (data.length > 0) {
                   let obj = {
-                    itemName: splitted[0],
-                    quantity: Number(splitted[index + 2][0]),
-                    Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                    itemName: data[0] + ' ' + data[1],
+                    quantity: Number(data[2]),
+                    Total: Number(data[3].split('.').join(''))
                   }
 
-                    hasil.push(obj)
-                  } else {
-                      let angka = splitted[index + 2][0] + splitted[index + 2][1]
-
+                  hasil.push(obj)
+                } else {
+                    if (splitted[index + 2][1] === ' ') {
                       let obj = {
                         itemName: splitted[0],
-                        quantity: Number(angka),
-                        Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                        quantity: Number(splitted[index + 2][0]),
+                        Total: Number(splitted[index + 2].slice(2).split('.').join(''))
                       }
-
+    
                       hasil.push(obj)
-                  }
-              } else if (Number(splitted[index + 1][0]) && index%2 === 0) {
-                  if (splitted[index + 1][1] === ' ') {
-                    let obj = {
-                      itemName: splitted[0],
-                      quantity: Number(splitted[index + 1][0]),
-                      Total: Number(splitted[index + 1].slice(2).split('.').join(''))
+                    } else {
+                        let angka = splitted[index + 2][0] + splitted[index + 2][1]
+  
+                        let obj = {
+                          itemName: splitted[0],
+                          quantity: Number(angka),
+                          Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                        }
+  
+                        hasil.push(obj)
                     }
-
+                }
+              } else if (Number(splitted[index + 1][0]) && index%2 === 0) {
+                  if (data.length > 0) {
+                    let obj = {
+                      itemName: data[0] + ' ' + data[1],
+                      quantity: Number(data[2]),
+                      Total: Number(data[3].split('.').join(''))
+                    }
+      
                     hasil.push(obj)
                   } else {
-                      let angka = splitted[index + 1][0] + splitted[index +2][1]
-
-                      let obj = {
-                        itemName: splitted[0],
-                        quantity: Number(angka),
-                        Total: Number(splitted[index + 1].slice(3).split('.').join(''))
+                      if (splitted[index + 1][1] === ' ') {
+                        let obj = {
+                          itemName: splitted[0],
+                          quantity: Number(splitted[index + 1][0]),
+                          Total: Number(splitted[index + 1].slice(2).split('.').join(''))
+                        }
+    
+                        hasil.push(obj)
+                      } else {
+                          let angka = splitted[index + 1][0] + splitted[index +2][1]
+    
+                          let obj = {
+                            itemName: splitted[0],
+                            quantity: Number(angka),
+                            Total: Number(splitted[index + 1].slice(3).split('.').join(''))
+                          }
+    
+                          hasil.push(obj)
                       }
-
-                      hasil.push(obj)
                   }
               } else {
                   let obj = {
@@ -120,46 +140,74 @@ function getText(reply, fileName, userId) {
               }
             } else {
                 if (!Number(splitted[index + 1][0]) && index%2 === 1) {
-                  if (splitted[index + 2][1] === ' ') {
+                  if (data.length > 0) {
                     let obj = {
-                      itemName: splitted[0],
-                      quantity: Number(splitted[index + 2][0]),
-                      Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                      itemName: data[0],
+                      quantity: Number(data[1]),
+                      Total: Number(data[2].split('.').join(''))
                     }
-
+      
                     hasil.push(obj)
                   } else {
-                      let angka = splitted[index + 2][0] + splitted[index + 2][1]
-
-                      let obj = {
-                        itemName: splitted[0],
-                        quantity: Number(angka),
-                        Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                      if (splitted[index + 2][1] === ' ') {
+                        let obj = {
+                          itemName: splitted[0],
+                          quantity: Number(splitted[index + 2][0]),
+                          Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                        }
+    
+                        hasil.push(obj)
+                      } else {
+                          let angka = splitted[index + 2][0] + splitted[index + 2][1]
+    
+                          let obj = {
+                            itemName: splitted[0],
+                            quantity: Number(angka),
+                            Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                          }
+    
+                          hasil.push(obj)
                       }
-
-                      hasil.push(obj)
                   }
-              } else {
-                  if (splitted[index + 1][1] === ' ') {
-                    let obj = {
-                      itemName: splitted[0],
-                      quantity: Number(splitted[index + 1][0]),
-                      Total: Number(splitted[index + 1].slice(2).split('.').join(''))
+                } else if (Number(splitted[index + 1][0]) && index%2 === 0) {
+                    if (data.length > 0) {
+                      let obj = {
+                        itemName: data[0],
+                        quantity: Number(data[1]),
+                        Total: Number(data[2].split('.').join(''))
+                      }
+        
+                      hasil.push(obj)
+                    } else {
+                        if (splitted[index + 1][1] === ' ') {
+                          let obj = {
+                            itemName: splitted[0],
+                            quantity: Number(splitted[index + 1][0]),
+                            Total: Number(splitted[index + 1].slice(2).split('.').join(''))
+                          }
+    
+                          hasil.push(obj)
+                        } else {
+                            let angka = splitted[index + 1][0] + splitted[index +2][1]
+    
+                            let obj = {
+                              itemName: splitted[0],
+                              quantity: Number(angka),
+                              Total: Number(splitted[index + 1].slice(3).split('.').join(''))
+                            }
+    
+                            hasil.push(obj)
+                        }
                     }
-
+                } else {
+                    let obj = {
+                      itemName: data[0],
+                      quantity: Number(data[1]),
+                      Total: Number(data[2].split('.').join(''))
+                    }
+      
                     hasil.push(obj)
-                  } else {
-                      let angka = splitted[index + 1][0] + splitted[index +2][1]
-
-                      let obj = {
-                        itemName: splitted[0],
-                        quantity: Number(angka),
-                        Total: Number(splitted[index + 1].slice(3).split('.').join(''))
-                      }
-
-                      hasil.push(obj)
-                  }
-              }
+                }
             }
           }
          })
