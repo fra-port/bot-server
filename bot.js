@@ -65,23 +65,22 @@ function getText(reply, fileName, userId) {
         let hasil = []
 
         splitted.forEach((split, index) => {
-          if (split[0]) {
-            let data = split.split(' ')
-            
+          let data = split.split(' ')
+
             if (data[0] === 'Paha' || data[0] === 'paha' || data[0] === 'PAHA') {
-              if (!Number(splitted[index + 1][0]) && index%2 === 1) {
-                if (data.length > 0) {
+              if (!Number(splitted[index + 1][0]) && index%2 === 0) {
+                if (data.length >= 3) {
                   let obj = {
                     itemName: data[0] + ' ' + data[1],
                     quantity: Number(data[2]),
                     Total: Number(data[3].split('.').join(''))
                   }
-
+  
                   hasil.push(obj)
-                } else {
+                } else if (data.length === 1) {
                     if (splitted[index + 2][1] === ' ') {
                       let obj = {
-                        itemName: splitted[0],
+                        itemName: data[0],
                         quantity: Number(splitted[index + 2][0]),
                         Total: Number(splitted[index + 2].slice(2).split('.').join(''))
                       }
@@ -91,7 +90,7 @@ function getText(reply, fileName, userId) {
                         let angka = splitted[index + 2][0] + splitted[index + 2][1]
   
                         let obj = {
-                          itemName: splitted[0],
+                          itemName: data[0],
                           quantity: Number(angka),
                           Total: Number(splitted[index + 2].slice(3).split('.').join(''))
                         }
@@ -99,8 +98,8 @@ function getText(reply, fileName, userId) {
                         hasil.push(obj)
                     }
                 }
-              } else if (Number(splitted[index + 1][0]) && index%2 === 0) {
-                  if (data.length > 0) {
+              } else if (Number(splitted[index + 1][0]) && index%2 === 1) {
+                  if (data.length >= 3) {
                     let obj = {
                       itemName: data[0] + ' ' + data[1],
                       quantity: Number(data[2]),
@@ -108,22 +107,22 @@ function getText(reply, fileName, userId) {
                     }
       
                     hasil.push(obj)
-                  } else {
-                      if (splitted[index + 1][1] === ' ') {
+                  } else if (data.length === 1) {
+                      if (splitted[index + 2][1] === ' ') {
                         let obj = {
-                          itemName: splitted[0],
-                          quantity: Number(splitted[index + 1][0]),
-                          Total: Number(splitted[index + 1].slice(2).split('.').join(''))
+                          itemName: data[0],
+                          quantity: Number(splitted[index + 2][0]),
+                          Total: Number(splitted[index + 2].slice(2).split('.').join(''))
                         }
     
                         hasil.push(obj)
                       } else {
-                          let angka = splitted[index + 1][0] + splitted[index +2][1]
+                          let angka = splitted[index + 2][0] + splitted[index +2][1]
     
                           let obj = {
-                            itemName: splitted[0],
+                            itemName: data[0],
                             quantity: Number(angka),
-                            Total: Number(splitted[index + 1].slice(3).split('.').join(''))
+                            Total: Number(splitted[index + 2].slice(3).split('.').join(''))
                           }
     
                           hasil.push(obj)
@@ -138,9 +137,9 @@ function getText(reply, fileName, userId) {
     
                   hasil.push(obj)
               }
-            } else {
-                if (!Number(splitted[index + 1][0]) && index%2 === 1) {
-                  if (data.length > 0) {
+            } else if (data[0] === 'Dada' || data[0] === 'dada' || data[0] === 'DADA' || data[0] === 'Sayap' || data[0] === 'sayap' || data[0] === 'SAYAP') {
+                if (!Number(splitted[index + 1][0]) && index%2 === 0) {
+                  if (data.length >= 3) {
                     let obj = {
                       itemName: data[0],
                       quantity: Number(data[1]),
@@ -148,10 +147,10 @@ function getText(reply, fileName, userId) {
                     }
       
                     hasil.push(obj)
-                  } else {
+                  } else if (data.length === 1) {
                       if (splitted[index + 2][1] === ' ') {
                         let obj = {
-                          itemName: splitted[0],
+                          itemName: data[0],
                           quantity: Number(splitted[index + 2][0]),
                           Total: Number(splitted[index + 2].slice(2).split('.').join(''))
                         }
@@ -161,7 +160,7 @@ function getText(reply, fileName, userId) {
                           let angka = splitted[index + 2][0] + splitted[index + 2][1]
     
                           let obj = {
-                            itemName: splitted[0],
+                            itemName: data[0],
                             quantity: Number(angka),
                             Total: Number(splitted[index + 2].slice(3).split('.').join(''))
                           }
@@ -169,8 +168,8 @@ function getText(reply, fileName, userId) {
                           hasil.push(obj)
                       }
                   }
-                } else if (Number(splitted[index + 1][0]) && index%2 === 0) {
-                    if (data.length > 0) {
+                } else if (Number(splitted[index + 1][0]) && index%2 === 1) {
+                    if (data.length >= 3) {
                       let obj = {
                         itemName: data[0],
                         quantity: Number(data[1]),
@@ -178,22 +177,22 @@ function getText(reply, fileName, userId) {
                       }
         
                       hasil.push(obj)
-                    } else {
-                        if (splitted[index + 1][1] === ' ') {
+                    } else if (data.length === 1) {
+                        if (splitted[index + 2][1] === ' ') {
                           let obj = {
-                            itemName: splitted[0],
-                            quantity: Number(splitted[index + 1][0]),
-                            Total: Number(splitted[index + 1].slice(2).split('.').join(''))
+                            itemName: data[0],
+                            quantity: Number(splitted[index + 2][0]),
+                            Total: Number(splitted[index + 2].slice(2).split('.').join(''))
                           }
     
                           hasil.push(obj)
                         } else {
-                            let angka = splitted[index + 1][0] + splitted[index +2][1]
+                            let angka = splitted[index + 2][0] + splitted[index +2][1]
     
                             let obj = {
-                              itemName: splitted[0],
+                              itemName: data[0],
                               quantity: Number(angka),
-                              Total: Number(splitted[index + 1].slice(3).split('.').join(''))
+                              Total: Number(splitted[index + 2].slice(3).split('.').join(''))
                             }
     
                             hasil.push(obj)
@@ -209,10 +208,9 @@ function getText(reply, fileName, userId) {
                     hasil.push(obj)
                 }
             }
-          }
-         })
-
-         isAlreadyReport(userId, hasil, reply)
+        })
+  
+        isAlreadyReport(userId, hasil, reply)
       })
       .catch(err => {
         reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
@@ -227,6 +225,7 @@ async function isAlreadyReport(userId, hasil, reply) {
   let a = await axios.get(`${server}/selling/today/${userId}`)
                   .then(response => {
                     if (response.data.result) {
+                      console.log(response.data)
                       reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)                      
                     } else {
                         axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
