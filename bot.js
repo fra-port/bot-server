@@ -137,7 +137,7 @@ function getText(reply, fileName, userId) {
     
                   hasil.push(obj)
               }
-            } else if (data[0] === 'Dada' || data[0] === 'dada' || data[0] === 'DADA' || data[0] === 'Sayap' || data[0] === 'sayap' || data[0] === 'SAYAP') {
+            } else if (!Number(data[0]) && data[0]) {
                 if (!Number(splitted[index + 1][0]) && index%2 === 0) {
                   if (data.length >= 3) {
                     let obj = {
