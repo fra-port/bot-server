@@ -67,7 +67,7 @@ function getText(reply, fileName, userId) {
         splitted.forEach((split, index) => {
           let data = split.split(' ')
 
-            if (data[0] === 'Paha' || data[0] === 'paha' || data[0] === 'PAHA') {
+            if (!Number(data[1]) && data[1]) {
               if (!Number(splitted[index + 1][0]) && index%2 === 0) {
                 if (data.length >= 3) {
                   let obj = {
@@ -209,7 +209,7 @@ function getText(reply, fileName, userId) {
                 }
             }
         })
-  
+
         isAlreadyReport(userId, hasil, reply)
       })
       .catch(err => {
@@ -225,7 +225,6 @@ async function isAlreadyReport(userId, hasil, reply) {
   let a = await axios.get(`${server}/selling/today/${userId}`)
                   .then(response => {
                     if (response.data.result) {
-                      console.log(response.data)
                       reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)                      
                     } else {
                         axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
