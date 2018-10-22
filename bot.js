@@ -239,10 +239,13 @@ bot.start((ctx) => {
 bot.help((ctx) => {
   ctx.reply(`List Perintah:`,
     Markup.inlineKeyboard([
-      Markup.callbackButton("Help", 'help'),
-      Markup.callbackButton("My ID", 'myId'),
-      Markup.callbackButton("My Report", 'myReport'),
-      Markup.callbackButton("Harga", 'harga')
+      [
+        Markup.callbackButton("Help", 'help'),
+        Markup.callbackButton("My ID", 'myId')
+      ], [
+        Markup.callbackButton("My Report", 'myReport'),
+        Markup.callbackButton("Harga", 'harga')
+      ]
     ]).extra()
   )
 })
@@ -331,12 +334,15 @@ bot.command('myReport', (ctx) => {
 
 bot.action('help', ctx => {
   ctx.reply(`List Perintah:`,
-    Markup.inlineKeyboard([
-      Markup.callbackButton("Help", 'help'),
-      Markup.callbackButton("My ID", 'myId'),
-      Markup.callbackButton("My Report", 'myReport'),
-      Markup.callbackButton("Harga", 'harga')
-    ]).extra()
+    Markup.keyboard([
+      [
+        Markup.callbackButton("Help", 'help'),
+        Markup.callbackButton("My ID", 'myId')
+      ], [
+        Markup.callbackButton("My Report", 'myReport'),
+        Markup.callbackButton("Harga", 'harga')
+      ]
+    ]).resize().extra()
   )
 })
 
