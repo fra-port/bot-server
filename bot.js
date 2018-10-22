@@ -1,5 +1,6 @@
 const Telegraf = require('telegraf')
 const Telegram = require('telegraf/telegram')
+const Markup = require('telegraf/markup')
 const axios = require('axios')
 const fs = require('fs')
 const emoji = require('node-emoji')
@@ -246,12 +247,14 @@ bot.start((ctx) => {
 })
 
 bot.help((ctx) => {
-  ctx.reply(`
-    ------------------- List Perintah -------------------
-    /help Melihat list perintah yang tersedia
-    /myId Melihat user id anda
-    /harga Melihat harga menu
-  `)
+  ctx.reply(`List Perintah:`,
+    Markup.inlineKeyboard([
+      Markup.callbackButton("Help", 'help'),
+      Markup.callbackButton("My ID", 'myId'),
+      Markup.callbackButton("My Report", 'myReport'),
+      Markup.callbackButton("Harga", 'harga')
+    ]).extra()
+  )
 })
 
 bot.on('photo', ({message, reply}) => {
@@ -289,6 +292,71 @@ bot.command('harga', (ctx) => {
     .then(response => {
       response.data.result.forEach(menu => {
         ctx.reply(`${menu.itemName} Rp. ${menu.price}`)
+      })
+    })
+    .catch(err => {
+      console.log('error')
+    })
+})
+
+bot.command('myReport', (ctx) => {
+  let userId = ctx.message.from.id
+
+  axios.get(`${server}/users/one/${userId}`)
+    .then(response => {
+      axios.get(`${server}/selling/today/${userId}`)
+        .then(response => {
+          console.log(response.data)
+          // if (response.data.result) {
+          //   response.data.result.selling.forEach(item => {
+          //     let total = 0
+          //     let product = `List item sold ${item.createdAt.toString().slice(0,10)}`
+
+          //     item.selling.forEach(element => {
+          //       total += Number(element.Total)
+          //       product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+          //     })
+
+          //     ctx.reply(`${product} \n total : Rp.${total.toLocaleString()}`)
+          //   })
+          // } else {
+          //   ctx.reply('Anda belum mengirimkan Report di hari ini!')
+          // }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    })
+    .catch(err => {
+      ctx.reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
+    })
+})
+
+bot.action('help', ctx => {
+  ctx.reply(`List Perintah:`,
+    Markup.inlineKeyboard([
+      Markup.callbackButton("Help", 'help'),
+      Markup.callbackButton("My ID", 'myId'),
+      Markup.callbackButton("My Report", 'myReport'),
+      Markup.callbackButton("Harga", 'harga')
+    ]).extra()
+  )
+})
+
+bot.action('myId', (ctx) => {
+  ctx.editMessageText(`${emoji.get('id')}: ${ctx.from.id}`)
+})
+
+bot.action('harga', (ctx) => {
+  axios.get(`${server}/items`)
+    .then(response => {
+      response.data.result.forEach((menu, index) => {
+        if (index === response.data.result.length - 1) {
+          ctx.reply(`${menu.itemName} Rp. ${menu.price}`)
+          ctx.editMessageText('Daftar Harga:')
+        } else {
+          ctx.reply(`${menu.itemName} Rp. ${menu.price}`)
+        }
       })
     })
     .catch(err => {
