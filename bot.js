@@ -211,7 +211,18 @@ function getText(reply, fileName, userId) {
             }
         })
 
-        sendToServer(hasil, reply, userId)
+        hasil.forEach(item => item.itemName = item.itemName.toLowerCase())
+
+        checkNull(hasil, userId, reply)
+          .then(a => {
+            sendToServer(hasil, ctx.reply, userId)
+          })
+          .catch(err => {
+            ctx.reply(`Atau anda dapat mengetik report manual dengan format\n
+            /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+            contoh:
+            /report dada 2 30.000, sayap 2 20.000`)
+          })
       })
       .catch(err => {
         reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
@@ -220,6 +231,18 @@ function getText(reply, fileName, userId) {
             reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
           })
       })
+}
+
+function checkNull(hasil, userId, reply) {
+  return new Promise((resolve, reject) => {
+    hasil.forEach(item => {
+      if (item.quantity == null || isNaN(item.quantity) || item.Total == null || isNaN(item.Total)) {
+        reject ('Null detected')
+      }
+    })
+
+    resolve(true)
+  })
 }
 
 async function sendToServer(hasil, reply, userId) {
@@ -240,11 +263,11 @@ bot.help((ctx) => {
   ctx.reply(`List Perintah:`,
     Markup.inlineKeyboard([
       [
-        Markup.callbackButton("Help", 'help'),
-        Markup.callbackButton("My ID", 'myId')
+        Markup.callbackButton("My ID", 'myId'),
+        Markup.callbackButton("My Report", 'myReport')
       ], [
-        Markup.callbackButton("My Report", 'myReport'),
-        Markup.callbackButton("Harga", 'harga')
+        Markup.callbackButton("Harga", 'harga'),
+        Markup.callbackButton("Report", 'report')
       ]
     ]).extra()
   )
@@ -253,13 +276,13 @@ bot.help((ctx) => {
 bot.on('photo', ({message, reply}) => {
   let userId = message.from.id
 
+  reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report.......`)
+
   axios.get(`${server}/users/one/${userId}`)
     .then(() => {
       axios.get(`${server}/selling/today/${userId}`)
         .then(response => {
           if (!response.data.result) {
-            reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report.......`)
-
             telegram.getFileLink(message.photo.pop().file_id)
               .then(async (link) => {
                 let image = await axios.get(link, { responseType:"stream" })
@@ -332,20 +355,6 @@ bot.command('myReport', (ctx) => {
     })
 })
 
-bot.action('help', ctx => {
-  ctx.reply(`List Perintah:`,
-    Markup.keyboard([
-      [
-        Markup.callbackButton("Help", 'help'),
-        Markup.callbackButton("My ID", 'myId')
-      ], [
-        Markup.callbackButton("My Report", 'myReport'),
-        Markup.callbackButton("Harga", 'harga')
-      ]
-    ]).resize().extra()
-  )
-})
-
 bot.action('myId', (ctx) => {
   ctx.editMessageText(`${emoji.get('id')}: ${ctx.from.id}`)
 })
@@ -364,6 +373,70 @@ bot.action('harga', (ctx) => {
     })
     .catch(err => {
       console.log('error')
+    })
+})
+
+bot.action('report', ctx => {
+  ctx.editMessageText(`Format report manual:\n
+  /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+  contoh:
+  /report dada 2 30.000, sayap 2 20.000`)
+})
+
+bot.hears(/report (.+)/, (ctx) => {
+  let reply = ctx.reply
+  let userId = ctx.message.from.id
+  let splitted = ctx.match[1].split(', ')
+  let hasil = []
+
+  ctx.reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report.......`)
+
+  axios.get(`${server}/users/one/${userId}`)
+    .then(() => {
+      axios.get(`${server}/selling/today/${userId}`)
+        .then(response => {
+          if (!response.data.result) {
+            splitted.forEach(item => {
+              let data = item.split(' ')
+              
+              if (!Number(data[1])) {
+                let obj = {
+                  itemName: data[0] + ' ' + data[1],
+                  quantity: data[2] ? Number(data[2]) : null,
+                  Total: data[3] ? Number(data[3].split('.').join('')) : null
+                }
+
+                hasil.push(obj)
+              } else if (!Number(data[0])) {
+                  let obj = {
+                    itemName: data[0],
+                    quantity: data[1] ? Number(data[1]) : null,
+                    Total: data[2] ? Number(data[2].split('.').join('')) : null
+                  }
+
+                  hasil.push(obj)
+              }
+            })
+
+            hasil.forEach(item => item.itemName = item.itemName.toLowerCase())
+
+            checkNull(hasil, userId, reply)
+              .then(a => {
+                sendToServer(hasil, ctx.reply, userId)
+              })
+              .catch(err => {
+                ctx.reply(`Atau anda dapat mengetik report manual dengan format\n
+                /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+                contoh:
+                /report dada 2 30.000, sayap 2 20.000`)
+              })
+          } else {
+              reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
+          }
+        }) 
+    })
+    .catch(err => {
+      reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
     })
 })
 
