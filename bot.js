@@ -211,7 +211,7 @@ function getText(reply, fileName, userId) {
             }
         })
 
-        isAlreadyReport(userId, hasil, reply)
+        sendToServer(hasil, reply, userId)
       })
       .catch(err => {
         reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
@@ -222,20 +222,10 @@ function getText(reply, fileName, userId) {
       })
 }
 
-async function isAlreadyReport(userId, hasil, reply) {
-  let a = await axios.get(`${server}/selling/today/${userId}`)
-                  .then(response => {
-                    if (response.data.result) {
-                      reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)                      
-                    } else {
-                        axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
-                          .then(() => {
-                            reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
-                          })
-                          .catch(err => {
-                            console.log(err)
-                          })
-                    }
+async function sendToServer(hasil, reply, userId) {
+  let a = await axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
+                  .then(() => {
+                    reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
                   })
                   .catch(err => {
                     console.log(err)
@@ -262,19 +252,26 @@ bot.on('photo', ({message, reply}) => {
 
   axios.get(`${server}/users/one/${userId}`)
     .then(() => {
-      reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report....... ${emoji.get('oncoming_automobile')}`)
+      axios.get(`${server}/selling/today/${userId}`)
+        .then(response => {
+          if (!response.data.result) {
+            reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report.......`)
 
-      telegram.getFileLink(message.photo.pop().file_id)
-        .then(async (link) => {
-          let image = await axios.get(link, { responseType:"stream" })
-                        .then(data => {
-                          const img = data.data
-                          downloadImage(img, reply, userId)
-                        })
-        })
-        .catch(error => {
-          console.log(err)
-        })
+            telegram.getFileLink(message.photo.pop().file_id)
+              .then(async (link) => {
+                let image = await axios.get(link, { responseType:"stream" })
+                                    .then(data => {
+                                      const img = data.data
+                                      downloadImage(img, reply, userId)
+                                    })
+              })
+              .catch(error => {
+                console.log(err)
+              })
+          } else {
+              reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
+          }
+        }) 
     })
     .catch(err => {
       reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
