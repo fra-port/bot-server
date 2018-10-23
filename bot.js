@@ -203,26 +203,20 @@ function getText(reply, fileName, userId) {
           })
           .catch(err => {
             reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-            telegram.sendPhoto(userId, { source: './format.jpg' })
-              .then(() => {
-                reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-                reply(`Atau anda dapat mengetik report manual dengan format\n
-                /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-                contoh:
-                /report dada 2, sayap 2`)
-              })
-          })
-      })
-      .catch(err => {
-        reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-        telegram.sendPhoto(userId, { source: './format.jpg' })
-          .then(() => {
             reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
             reply(`Atau anda dapat mengetik report manual dengan format\n
             /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
             contoh:
             /report dada 2, sayap 2`)
           })
+      })
+      .catch(err => {
+        reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+        reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+        reply(`Atau anda dapat mengetik report manual dengan format\n
+        /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
+        contoh:
+        /report dada 2, sayap 2`)
       })
 }
 
