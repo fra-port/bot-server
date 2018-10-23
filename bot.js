@@ -347,24 +347,17 @@ bot.command('myReport', (ctx) => {
 
   axios.get(`${server}/users/one/${userId}`)
     .then(response => {
-      axios.get(`${server}/selling/today/${userId}`)
-        .then(response => {
-          console.log(response.data)
-          // if (response.data.result) {
-          //   response.data.result.selling.forEach(item => {
-          //     let total = 0
-          //     let product = `List item sold ${item.createdAt.toString().slice(0,10)}`
-
-          //     item.selling.forEach(element => {
-          //       total += Number(element.Total)
-          //       product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
-          //     })
-
-          //     ctx.reply(`${product} \n total : Rp.${total.toLocaleString()}`)
-          //   })
-          // } else {
-          //   ctx.reply('Anda belum mengirimkan Report di hari ini!')
-          // }
+      axios.get(`${server}/selling/telegram/${userId}`)
+        .then(({ data }) => {
+          data.forEach(item => {
+            let total = 0
+            let product = `List item sold ${item.createdAt.toString().slice(0, 10)}`
+            item.selling.forEach(element => {
+              total += Number(element.Total)
+              product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+            });
+            ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+          });
         })
         .catch(err => {
           console.log(err)
