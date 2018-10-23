@@ -396,6 +396,37 @@ bot.action('report', ctx => {
   /report dada 2 30.000, sayap 2 20.000`)
 })
 
+bot.action('myReport', (ctx) => {
+  let userId = ctx.from.id
+
+  axios.get(`${server}/users/one/${userId}`)
+    .then(response => {
+      axios.get(`${server}/selling/telegram/${userId}`)
+        .then(({ data }) => {
+          data.forEach((item, index) => {
+            let total = 0
+            let product = `List item sold ${item.createdAt.toString().slice(0, 10)}`
+            item.selling.forEach(element => {
+              total += Number(element.Total)
+              product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+            });
+            
+            if (index === data.length - 1) {
+              ctx.editMessageText(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+            } else {
+              ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+            }
+          });
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    })
+    .catch(err => {
+      ctx.reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
+    })
+})
+
 bot.hears(/report (.+)/, (ctx) => {
   let reply = ctx.reply
   let userId = ctx.message.from.id
