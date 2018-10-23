@@ -1,5 +1,6 @@
 const Telegraf = require('telegraf')
 const Telegram = require('telegraf/telegram')
+const Markup = require('telegraf/markup')
 const axios = require('axios')
 const fs = require('fs')
 const emoji = require('node-emoji')
@@ -210,7 +211,7 @@ function getText(reply, fileName, userId) {
             }
         })
 
-        isAlreadyReport(userId, hasil, reply)
+        sendToServer(hasil, reply, userId)
       })
       .catch(err => {
         reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
@@ -221,20 +222,10 @@ function getText(reply, fileName, userId) {
       })
 }
 
-async function isAlreadyReport(userId, hasil, reply) {
-  let a = await axios.get(`${server}/selling/today/${userId}`)
-                  .then(response => {
-                    if (response.data.result) {
-                      reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)                      
-                    } else {
-                        axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
-                          .then(() => {
-                            reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
-                          })
-                          .catch(err => {
-                            console.log(err)
-                          })
-                    }
+async function sendToServer(hasil, reply, userId) {
+  let a = await axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
+                  .then(() => {
+                    reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
                   })
                   .catch(err => {
                     console.log(err)
@@ -246,12 +237,14 @@ bot.start((ctx) => {
 })
 
 bot.help((ctx) => {
-  ctx.reply(`
-    ------------------- List Perintah -------------------
-    /help Melihat list perintah yang tersedia
-    /myId Melihat user id anda
-    /harga Melihat harga menu
-  `)
+  ctx.reply(`List Perintah:`,
+    Markup.inlineKeyboard([
+      Markup.callbackButton("Help", 'help'),
+      Markup.callbackButton("My ID", 'myId'),
+      Markup.callbackButton("My Report", 'myReport'),
+      Markup.callbackButton("Harga", 'harga')
+    ]).extra()
+  )
 })
 
 bot.on('photo', ({message, reply}) => {
@@ -259,19 +252,26 @@ bot.on('photo', ({message, reply}) => {
 
   axios.get(`${server}/users/one/${userId}`)
     .then(() => {
-      reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report....... ${emoji.get('oncoming_automobile')}`)
+      axios.get(`${server}/selling/today/${userId}`)
+        .then(response => {
+          if (!response.data.result) {
+            reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report.......`)
 
-      telegram.getFileLink(message.photo.pop().file_id)
-        .then(async (link) => {
-          let image = await axios.get(link, { responseType:"stream" })
-                        .then(data => {
-                          const img = data.data
-                          downloadImage(img, reply, userId)
-                        })
-        })
-        .catch(error => {
-          console.log(err)
-        })
+            telegram.getFileLink(message.photo.pop().file_id)
+              .then(async (link) => {
+                let image = await axios.get(link, { responseType:"stream" })
+                                    .then(data => {
+                                      const img = data.data
+                                      downloadImage(img, reply, userId)
+                                    })
+              })
+              .catch(error => {
+                console.log(err)
+              })
+          } else {
+              reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
+          }
+        }) 
     })
     .catch(err => {
       reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
@@ -289,6 +289,71 @@ bot.command('harga', (ctx) => {
     .then(response => {
       response.data.result.forEach(menu => {
         ctx.reply(`${menu.itemName} Rp. ${menu.price}`)
+      })
+    })
+    .catch(err => {
+      console.log('error')
+    })
+})
+
+bot.command('myReport', (ctx) => {
+  let userId = ctx.message.from.id
+
+  axios.get(`${server}/users/one/${userId}`)
+    .then(response => {
+      axios.get(`${server}/selling/today/${userId}`)
+        .then(response => {
+          console.log(response.data)
+          // if (response.data.result) {
+          //   response.data.result.selling.forEach(item => {
+          //     let total = 0
+          //     let product = `List item sold ${item.createdAt.toString().slice(0,10)}`
+
+          //     item.selling.forEach(element => {
+          //       total += Number(element.Total)
+          //       product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+          //     })
+
+          //     ctx.reply(`${product} \n total : Rp.${total.toLocaleString()}`)
+          //   })
+          // } else {
+          //   ctx.reply('Anda belum mengirimkan Report di hari ini!')
+          // }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    })
+    .catch(err => {
+      ctx.reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
+    })
+})
+
+bot.action('help', ctx => {
+  ctx.reply(`List Perintah:`,
+    Markup.inlineKeyboard([
+      Markup.callbackButton("Help", 'help'),
+      Markup.callbackButton("My ID", 'myId'),
+      Markup.callbackButton("My Report", 'myReport'),
+      Markup.callbackButton("Harga", 'harga')
+    ]).extra()
+  )
+})
+
+bot.action('myId', (ctx) => {
+  ctx.editMessageText(`${emoji.get('id')}: ${ctx.from.id}`)
+})
+
+bot.action('harga', (ctx) => {
+  axios.get(`${server}/items`)
+    .then(response => {
+      response.data.result.forEach((menu, index) => {
+        if (index === response.data.result.length - 1) {
+          ctx.reply(`${menu.itemName} Rp. ${menu.price}`)
+          ctx.editMessageText('Daftar Harga:')
+        } else {
+          ctx.reply(`${menu.itemName} Rp. ${menu.price}`)
+        }
       })
     })
     .catch(err => {
