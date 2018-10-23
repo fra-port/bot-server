@@ -211,8 +211,6 @@ function getText(reply, fileName, userId) {
             }
         })
 
-        hasil.forEach(item => item.itemName = item.itemName.toLowerCase())
-
         checkNull(hasil, userId, reply)
           .then(a => {
             sendToServer(hasil, reply, userId)
@@ -258,6 +256,19 @@ async function sendToServer(hasil, reply, userId) {
   let a = await axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
                   .then(() => {
                     reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
+                      .then( () => {
+                        let total = 0
+                        let product = `Saved report today : `
+                        hasil.forEach(element => {
+                          total += Number(element.Total)
+                          product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+                        })
+
+                        reply(`${product}\ntotal : Rp.${total.toLocaleString()}`)
+                      })
+                      .catch(err => {
+                        console.log(err)
+                      })
                   })
                   .catch(err => {
                     console.log(err)
