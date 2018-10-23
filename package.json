@@ -1,0 +1,29 @@
+{
+  "name": "bot-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "dependencies": {
+    "@google-cloud/storage": "^2.1.0",
+    "@google-cloud/vision": "^0.22.1",
+    "axios": "^0.18.0",
+    "cron": "^1.4.1",
+    "dotenv": "^6.1.0",
+    "node-emoji": "^1.8.1",
+    "telegraf": "^3.24.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fra-port/bot-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fra-port/bot-server/issues"
+  },
+  "homepage": "https://github.com/fra-port/bot-server#readme"
+}
