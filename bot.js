@@ -62,161 +62,75 @@ function getText(reply, fileName, userId) {
       .then(results => {
         const text = results[0].fullTextAnnotation.text
         const splitted = text.split('\n')
-
+        console.log(splitted)
         let hasil = []
 
         splitted.forEach((split, index) => {
           let data = split.split(' ')
 
             if (!Number(data[1]) && data[1]) {
-              if (!Number(splitted[index + 1][0]) && index%2 === 0) {
-                if (data.length >= 3) {
-                  let obj = {
-                    itemName: data[0] + ' ' + data[1],
-                    quantity: Number(data[2])
-                  }
-  
-                  hasil.push(obj)
-                } else if (data.length === 1) {
-                    if (splitted[index + 2][1] === ' ') {
-                      let obj = {
-                        itemName: data[0],
-                        quantity: Number(splitted[index + 2][0])
-                      }
-    
-                      hasil.push(obj)
-                    } else {
-                        let angka = splitted[index + 2][0] + splitted[index + 2][1]
-  
-                        let obj = {
-                          itemName: data[0],
-                          quantity: Number(angka)
-                        }
-  
-                        hasil.push(obj)
-                    }
+              if (data[1].length === 1 || data[1].length === 2) {
+                if (data[1][0] === '|' || data[1][0] === 'I' || data[1][0] === 'l') {
+                  data[1] = data[1].length === 1 ? '1' : '1' + data[1][1]
                 }
-              } else if (Number(splitted[index + 1][0]) && index%2 === 1) {
-                  if (data.length >= 3) {
-                    let obj = {
-                      itemName: data[0] + ' ' + data[1],
-                      quantity: Number(data[2])
-                    }
-      
-                    hasil.push(obj)
-                  } else if (data.length === 1) {
-                      if (splitted[index + 2][1] === ' ') {
-                        let obj = {
-                          itemName: data[0],
-                          quantity: Number(splitted[index + 2][0])
-                        }
-    
-                        hasil.push(obj)
-                      } else {
-                          let angka = splitted[index + 2][0] + splitted[index +2][1]
-    
-                          let obj = {
-                            itemName: data[0],
-                            quantity: Number(angka)
-                          }
-    
-                          hasil.push(obj)
-                      }
-                  }
+
+                if (data[1][0] === 's' || data[1][0] === 'S') {
+                  data[1] = data[1].length === 1 ? '5' : '5' + data[1][1]
+                }
+
+                if (data[1][0] === 'g' || data[1][0] === 'G') {
+                  data[1] = data[1].length === 1 ? '6' : '6' + data[1][1]
+                }
+
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(data[1])
+                }
+  
+                hasil.push(obj)
               } else {
-                  let obj = {
-                    itemName: data[0] + ' ' + data[1],
-                    quantity: Number(data[2])
-                  }
-    
-                  hasil.push(obj)
+                let obj = {
+                  itemName: data[0] + ' ' + data[1],
+                  quantity: Number(data[2])
+                }
+  
+                hasil.push(obj)
               }
             } else if (!Number(data[0]) && data[0]) {
-                if (!Number(splitted[index + 1][0]) && index%2 === 0) {
-                  if (data.length >= 3) {
-                    let obj = {
-                      itemName: data[0],
-                      quantity: Number(data[1])
-                    }
-      
-                    hasil.push(obj)
-                  } else if (data.length === 1) {
-                      if (splitted[index + 2][1] === ' ') {
-                        let obj = {
-                          itemName: data[0],
-                          quantity: Number(splitted[index + 2][0])
-                        }
-    
-                        hasil.push(obj)
-                      } else {
-                          let angka = splitted[index + 2][0] + splitted[index + 2][1]
-    
-                          let obj = {
-                            itemName: data[0],
-                            quantity: Number(angka)
-                          }
-    
-                          hasil.push(obj)
-                      }
-                  }
-                } else if (Number(splitted[index + 1][0]) && index%2 === 1) {
-                    if (data.length >= 3) {
-                      let obj = {
-                        itemName: data[0],
-                        quantity: Number(data[1])
-                      }
-        
-                      hasil.push(obj)
-                    } else if (data.length === 1) {
-                        if (splitted[index + 2][1] === ' ') {
-                          let obj = {
-                            itemName: data[0],
-                            quantity: Number(splitted[index + 2][0])
-                          }
-    
-                          hasil.push(obj)
-                        } else {
-                            let angka = splitted[index + 2][0] + splitted[index +2][1]
-    
-                            let obj = {
-                              itemName: data[0],
-                              quantity: Number(angka)
-                            }
-    
-                            hasil.push(obj)
-                        }
-                    }
-                } else {
-                    let obj = {
-                      itemName: data[0],
-                      quantity: Number(data[1])
-                    }
-      
-                    hasil.push(obj)
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(data[1])
                 }
+  
+                hasil.push(obj)
             }
         })
 
+        console.log(hasil)
         checkNull(hasil, userId, reply)
           .then(a => {
             sendToServer(hasil, reply, userId)
           })
           .catch(err => {
             reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+              .then(() => {
+                reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+                reply(`Atau anda dapat mengetik report manual dengan format\n
+                /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
+                contoh:
+                /report dada 2, sayap 2`)
+              })
+          })
+      })
+      .catch(err => {
+        reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+          .then(() => {
             reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
             reply(`Atau anda dapat mengetik report manual dengan format\n
             /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
             contoh:
             /report dada 2, sayap 2`)
           })
-      })
-      .catch(err => {
-        reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-        reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-        reply(`Atau anda dapat mengetik report manual dengan format\n
-        /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-        contoh:
-        /report dada 2, sayap 2`)
       })
 }
 
