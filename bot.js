@@ -223,7 +223,7 @@ function getText(reply, fileName, userId) {
 function checkNull(hasil, userId, reply) {
   return new Promise((resolve, reject) => {
     hasil.forEach(item => {
-      if (item.quantity == null || item.quantity == NaN) {
+      if (item.quantity == null || isNaN(item.quantity)) {
         reject ('Null detected')
       }
     })
