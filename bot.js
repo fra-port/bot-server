@@ -65,6 +65,10 @@ function getText(reply, fileName, userId) {
 
         let hasil = []
 
+        if(splitte){
+
+        }
+
         splitted.forEach((split, index) => {
           let data = split.split(' ')
 
@@ -439,6 +443,8 @@ bot.hears(/report (.+)/, (ctx) => {
       reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
     })
 })
+
+
 
 // Start polling
 bot.startPolling()
