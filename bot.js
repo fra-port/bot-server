@@ -215,13 +215,18 @@ function getText(reply, fileName, userId) {
 
         checkNull(hasil, userId, reply)
           .then(a => {
-            sendToServer(hasil, ctx.reply, userId)
+            sendToServer(hasil, reply, userId)
           })
           .catch(err => {
-            ctx.reply(`Atau anda dapat mengetik report manual dengan format\n
-            /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
-            contoh:
-            /report dada 2 30.000, sayap 2 20.000`)
+            reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+            telegram.sendPhoto(userId, { source: './format.jpg' })
+              .then(() => {
+                reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+                reply(`Atau anda dapat mengetik report manual dengan format\n
+                /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+                contoh:
+                /report dada 2 30.000, sayap 2 20.000`)
+              })
           })
       })
       .catch(err => {
@@ -229,6 +234,10 @@ function getText(reply, fileName, userId) {
         telegram.sendPhoto(userId, { source: './format.jpg' })
           .then(() => {
             reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+            reply(`Atau anda dapat mengetik report manual dengan format\n
+            /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+            contoh:
+            /report dada 2 30.000, sayap 2 20.000`)
           })
       })
 }
@@ -236,7 +245,7 @@ function getText(reply, fileName, userId) {
 function checkNull(hasil, userId, reply) {
   return new Promise((resolve, reject) => {
     hasil.forEach(item => {
-      if (item.quantity == null || isNaN(item.quantity) || item.Total == null || isNaN(item.Total)) {
+      if (item.quantity == null || item.quantity == NaN || item.Total == null || item.Total == NaN) {
         reject ('Null detected')
       }
     })
