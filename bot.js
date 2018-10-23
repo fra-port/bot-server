@@ -48,10 +48,10 @@ function uploadImage(reply, userId) {
   const localReadStream = fs.createReadStream('test.jpg');
   const fileName = String(Date.now())
   const remoteWriteStream = bucket.file(fileName + '.jpg').createWriteStream();
-  
+
   localReadStream.pipe(remoteWriteStream)
-    .on('error', function(err) {})
-    .on('finish', function() {
+    .on('error', function (err) { })
+    .on('finish', function () {
       getText(reply, fileName, userId)
     });
 }
@@ -59,185 +59,189 @@ function uploadImage(reply, userId) {
 function getText(reply, fileName, userId) {
   client
     .documentTextDetection(`gs://${process.env.BUCKET_NAME}/${fileName}.jpg`)
-      .then(results => {
-        const text = results[0].fullTextAnnotation.text
-        const splitted = text.split('\n')
+    .then(results => {
+      const text = results[0].fullTextAnnotation.text
+      const splitted = text.split('\n')
 
-        let hasil = []
+      let hasil = []
 
-        splitted.forEach((split, index) => {
-          let data = split.split(' ')
+      if (splitte) {
 
-            if (!Number(data[1]) && data[1]) {
-              if (!Number(splitted[index + 1][0]) && index%2 === 0) {
-                if (data.length >= 3) {
-                  let obj = {
-                    itemName: data[0] + ' ' + data[1],
-                    quantity: Number(data[2]),
-                    Total: Number(data[3].split('.').join(''))
-                  }
-  
-                  hasil.push(obj)
-                } else if (data.length === 1) {
-                    if (splitted[index + 2][1] === ' ') {
-                      let obj = {
-                        itemName: data[0],
-                        quantity: Number(splitted[index + 2][0]),
-                        Total: Number(splitted[index + 2].slice(2).split('.').join(''))
-                      }
-    
-                      hasil.push(obj)
-                    } else {
-                        let angka = splitted[index + 2][0] + splitted[index + 2][1]
-  
-                        let obj = {
-                          itemName: data[0],
-                          quantity: Number(angka),
-                          Total: Number(splitted[index + 2].slice(3).split('.').join(''))
-                        }
-  
-                        hasil.push(obj)
-                    }
-                }
-              } else if (Number(splitted[index + 1][0]) && index%2 === 1) {
-                  if (data.length >= 3) {
-                    let obj = {
-                      itemName: data[0] + ' ' + data[1],
-                      quantity: Number(data[2]),
-                      Total: Number(data[3].split('.').join(''))
-                    }
-      
-                    hasil.push(obj)
-                  } else if (data.length === 1) {
-                      if (splitted[index + 2][1] === ' ') {
-                        let obj = {
-                          itemName: data[0],
-                          quantity: Number(splitted[index + 2][0]),
-                          Total: Number(splitted[index + 2].slice(2).split('.').join(''))
-                        }
-    
-                        hasil.push(obj)
-                      } else {
-                          let angka = splitted[index + 2][0] + splitted[index +2][1]
-    
-                          let obj = {
-                            itemName: data[0],
-                            quantity: Number(angka),
-                            Total: Number(splitted[index + 2].slice(3).split('.').join(''))
-                          }
-    
-                          hasil.push(obj)
-                      }
-                  }
-              } else {
-                  let obj = {
-                    itemName: data[0] + ' ' + data[1],
-                    quantity: Number(data[2]),
-                    Total: Number(data[3].split('.').join(''))
-                  }
-    
-                  hasil.push(obj)
+      }
+
+      splitted.forEach((split, index) => {
+        let data = split.split(' ')
+
+        if (!Number(data[1]) && data[1]) {
+          if (!Number(splitted[index + 1][0]) && index % 2 === 0) {
+            if (data.length >= 3) {
+              let obj = {
+                itemName: data[0] + ' ' + data[1],
+                quantity: Number(data[2]),
+                Total: Number(data[3].split('.').join(''))
               }
-            } else if (!Number(data[0]) && data[0]) {
-                if (!Number(splitted[index + 1][0]) && index%2 === 0) {
-                  if (data.length >= 3) {
-                    let obj = {
-                      itemName: data[0],
-                      quantity: Number(data[1]),
-                      Total: Number(data[2].split('.').join(''))
-                    }
-      
-                    hasil.push(obj)
-                  } else if (data.length === 1) {
-                      if (splitted[index + 2][1] === ' ') {
-                        let obj = {
-                          itemName: data[0],
-                          quantity: Number(splitted[index + 2][0]),
-                          Total: Number(splitted[index + 2].slice(2).split('.').join(''))
-                        }
-    
-                        hasil.push(obj)
-                      } else {
-                          let angka = splitted[index + 2][0] + splitted[index + 2][1]
-    
-                          let obj = {
-                            itemName: data[0],
-                            quantity: Number(angka),
-                            Total: Number(splitted[index + 2].slice(3).split('.').join(''))
-                          }
-    
-                          hasil.push(obj)
-                      }
-                  }
-                } else if (Number(splitted[index + 1][0]) && index%2 === 1) {
-                    if (data.length >= 3) {
-                      let obj = {
-                        itemName: data[0],
-                        quantity: Number(data[1]),
-                        Total: Number(data[2].split('.').join(''))
-                      }
-        
-                      hasil.push(obj)
-                    } else if (data.length === 1) {
-                        if (splitted[index + 2][1] === ' ') {
-                          let obj = {
-                            itemName: data[0],
-                            quantity: Number(splitted[index + 2][0]),
-                            Total: Number(splitted[index + 2].slice(2).split('.').join(''))
-                          }
-    
-                          hasil.push(obj)
-                        } else {
-                            let angka = splitted[index + 2][0] + splitted[index +2][1]
-    
-                            let obj = {
-                              itemName: data[0],
-                              quantity: Number(angka),
-                              Total: Number(splitted[index + 2].slice(3).split('.').join(''))
-                            }
-    
-                            hasil.push(obj)
-                        }
-                    }
-                } else {
-                    let obj = {
-                      itemName: data[0],
-                      quantity: Number(data[1]),
-                      Total: Number(data[2].split('.').join(''))
-                    }
-      
-                    hasil.push(obj)
+
+              hasil.push(obj)
+            } else if (data.length === 1) {
+              if (splitted[index + 2][1] === ' ') {
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(splitted[index + 2][0]),
+                  Total: Number(splitted[index + 2].slice(2).split('.').join(''))
                 }
+
+                hasil.push(obj)
+              } else {
+                let angka = splitted[index + 2][0] + splitted[index + 2][1]
+
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(angka),
+                  Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                }
+
+                hasil.push(obj)
+              }
             }
+          } else if (Number(splitted[index + 1][0]) && index % 2 === 1) {
+            if (data.length >= 3) {
+              let obj = {
+                itemName: data[0] + ' ' + data[1],
+                quantity: Number(data[2]),
+                Total: Number(data[3].split('.').join(''))
+              }
+
+              hasil.push(obj)
+            } else if (data.length === 1) {
+              if (splitted[index + 2][1] === ' ') {
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(splitted[index + 2][0]),
+                  Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                }
+
+                hasil.push(obj)
+              } else {
+                let angka = splitted[index + 2][0] + splitted[index + 2][1]
+
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(angka),
+                  Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                }
+
+                hasil.push(obj)
+              }
+            }
+          } else {
+            let obj = {
+              itemName: data[0] + ' ' + data[1],
+              quantity: Number(data[2]),
+              Total: Number(data[3].split('.').join(''))
+            }
+
+            hasil.push(obj)
+          }
+        } else if (!Number(data[0]) && data[0]) {
+          if (!Number(splitted[index + 1][0]) && index % 2 === 0) {
+            if (data.length >= 3) {
+              let obj = {
+                itemName: data[0],
+                quantity: Number(data[1]),
+                Total: Number(data[2].split('.').join(''))
+              }
+
+              hasil.push(obj)
+            } else if (data.length === 1) {
+              if (splitted[index + 2][1] === ' ') {
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(splitted[index + 2][0]),
+                  Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                }
+
+                hasil.push(obj)
+              } else {
+                let angka = splitted[index + 2][0] + splitted[index + 2][1]
+
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(angka),
+                  Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                }
+
+                hasil.push(obj)
+              }
+            }
+          } else if (Number(splitted[index + 1][0]) && index % 2 === 1) {
+            if (data.length >= 3) {
+              let obj = {
+                itemName: data[0],
+                quantity: Number(data[1]),
+                Total: Number(data[2].split('.').join(''))
+              }
+
+              hasil.push(obj)
+            } else if (data.length === 1) {
+              if (splitted[index + 2][1] === ' ') {
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(splitted[index + 2][0]),
+                  Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                }
+
+                hasil.push(obj)
+              } else {
+                let angka = splitted[index + 2][0] + splitted[index + 2][1]
+
+                let obj = {
+                  itemName: data[0],
+                  quantity: Number(angka),
+                  Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                }
+
+                hasil.push(obj)
+              }
+            }
+          } else {
+            let obj = {
+              itemName: data[0],
+              quantity: Number(data[1]),
+              Total: Number(data[2].split('.').join(''))
+            }
+
+            hasil.push(obj)
+          }
+        }
+      })
+
+      hasil.forEach(item => item.itemName = item.itemName.toLowerCase())
+
+      checkNull(hasil, userId, reply)
+        .then(a => {
+          sendToServer(hasil, ctx.reply, userId)
         })
-
-        hasil.forEach(item => item.itemName = item.itemName.toLowerCase())
-
-        checkNull(hasil, userId, reply)
-          .then(a => {
-            sendToServer(hasil, ctx.reply, userId)
-          })
-          .catch(err => {
-            ctx.reply(`Atau anda dapat mengetik report manual dengan format\n
+        .catch(err => {
+          ctx.reply(`Atau anda dapat mengetik report manual dengan format\n
             /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
             contoh:
             /report dada 2 30.000, sayap 2 20.000`)
-          })
-      })
-      .catch(err => {
-        reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-        telegram.sendPhoto(userId, { source: './format.jpg' })
-          .then(() => {
-            reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-          })
-      })
+        })
+    })
+    .catch(err => {
+      reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+      telegram.sendPhoto(userId, { source: './format.jpg' })
+        .then(() => {
+          reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+        })
+    })
 }
 
 function checkNull(hasil, userId, reply) {
   return new Promise((resolve, reject) => {
     hasil.forEach(item => {
       if (item.quantity == null || isNaN(item.quantity) || item.Total == null || isNaN(item.Total)) {
-        reject ('Null detected')
+        reject('Null detected')
       }
     })
 
@@ -247,12 +251,12 @@ function checkNull(hasil, userId, reply) {
 
 async function sendToServer(hasil, reply, userId) {
   let a = await axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
-                  .then(() => {
-                    reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
-                  })
-                  .catch(err => {
-                    console.log(err)
-                  })
+    .then(() => {
+      reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
+    })
+    .catch(err => {
+      console.log(err)
+    })
 }
 
 bot.start((ctx) => {
@@ -273,7 +277,7 @@ bot.help((ctx) => {
   )
 })
 
-bot.on('photo', ({message, reply}) => {
+bot.on('photo', ({ message, reply }) => {
   let userId = message.from.id
 
   reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report.......`)
@@ -285,19 +289,19 @@ bot.on('photo', ({message, reply}) => {
           if (!response.data.result) {
             telegram.getFileLink(message.photo.pop().file_id)
               .then(async (link) => {
-                let image = await axios.get(link, { responseType:"stream" })
-                                    .then(data => {
-                                      const img = data.data
-                                      downloadImage(img, reply, userId)
-                                    })
+                let image = await axios.get(link, { responseType: "stream" })
+                  .then(data => {
+                    const img = data.data
+                    downloadImage(img, reply, userId)
+                  })
               })
               .catch(error => {
                 console.log(err)
               })
           } else {
-              reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
+            reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
           }
-        }) 
+        })
     })
     .catch(err => {
       reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
@@ -323,28 +327,20 @@ bot.command('harga', (ctx) => {
 })
 
 bot.command('myReport', (ctx) => {
-  let userId = ctx.message.from.id
 
   axios.get(`${server}/users/one/${userId}`)
     .then(response => {
-      axios.get(`${server}/selling/today/${userId}`)
-        .then(response => {
-          console.log(response.data)
-          // if (response.data.result) {
-          //   response.data.result.selling.forEach(item => {
-          //     let total = 0
-          //     let product = `List item sold ${item.createdAt.toString().slice(0,10)}`
-
-          //     item.selling.forEach(element => {
-          //       total += Number(element.Total)
-          //       product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
-          //     })
-
-          //     ctx.reply(`${product} \n total : Rp.${total.toLocaleString()}`)
-          //   })
-          // } else {
-          //   ctx.reply('Anda belum mengirimkan Report di hari ini!')
-          // }
+      axios.get(`${server}/selling/telegram/${ctx.from.id}`)
+        .then(({ data }) => {
+          data.forEach(item => {
+            let total = 0
+            let product = `list item sold ${item.createdAt.toString().slice(0, 10)}`
+            item.selling.forEach(element => {
+              total += Number(element.Total)
+              product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+            });
+            ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+          });
         })
         .catch(err => {
           console.log(err)
@@ -353,6 +349,7 @@ bot.command('myReport', (ctx) => {
     .catch(err => {
       ctx.reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
     })
+    
 })
 
 bot.action('myId', (ctx) => {
@@ -398,7 +395,7 @@ bot.hears(/report (.+)/, (ctx) => {
           if (!response.data.result) {
             splitted.forEach(item => {
               let data = item.split(' ')
-              
+
               if (!Number(data[1])) {
                 let obj = {
                   itemName: data[0] + ' ' + data[1],
@@ -408,13 +405,13 @@ bot.hears(/report (.+)/, (ctx) => {
 
                 hasil.push(obj)
               } else if (!Number(data[0])) {
-                  let obj = {
-                    itemName: data[0],
-                    quantity: data[1] ? Number(data[1]) : null,
-                    Total: data[2] ? Number(data[2].split('.').join('')) : null
-                  }
+                let obj = {
+                  itemName: data[0],
+                  quantity: data[1] ? Number(data[1]) : null,
+                  Total: data[2] ? Number(data[2].split('.').join('')) : null
+                }
 
-                  hasil.push(obj)
+                hasil.push(obj)
               }
             })
 
@@ -431,14 +428,16 @@ bot.hears(/report (.+)/, (ctx) => {
                 /report dada 2 30.000, sayap 2 20.000`)
               })
           } else {
-              reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
+            reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
           }
-        }) 
+        })
     })
     .catch(err => {
       reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
     })
 })
+
+
 
 // Start polling
 bot.startPolling()
