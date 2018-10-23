@@ -73,8 +73,7 @@ function getText(reply, fileName, userId) {
                 if (data.length >= 3) {
                   let obj = {
                     itemName: data[0] + ' ' + data[1],
-                    quantity: Number(data[2]),
-                    Total: Number(data[3].split('.').join(''))
+                    quantity: Number(data[2])
                   }
   
                   hasil.push(obj)
@@ -82,8 +81,7 @@ function getText(reply, fileName, userId) {
                     if (splitted[index + 2][1] === ' ') {
                       let obj = {
                         itemName: data[0],
-                        quantity: Number(splitted[index + 2][0]),
-                        Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                        quantity: Number(splitted[index + 2][0])
                       }
     
                       hasil.push(obj)
@@ -92,8 +90,7 @@ function getText(reply, fileName, userId) {
   
                         let obj = {
                           itemName: data[0],
-                          quantity: Number(angka),
-                          Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                          quantity: Number(angka)
                         }
   
                         hasil.push(obj)
@@ -103,8 +100,7 @@ function getText(reply, fileName, userId) {
                   if (data.length >= 3) {
                     let obj = {
                       itemName: data[0] + ' ' + data[1],
-                      quantity: Number(data[2]),
-                      Total: Number(data[3].split('.').join(''))
+                      quantity: Number(data[2])
                     }
       
                     hasil.push(obj)
@@ -112,8 +108,7 @@ function getText(reply, fileName, userId) {
                       if (splitted[index + 2][1] === ' ') {
                         let obj = {
                           itemName: data[0],
-                          quantity: Number(splitted[index + 2][0]),
-                          Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                          quantity: Number(splitted[index + 2][0])
                         }
     
                         hasil.push(obj)
@@ -122,8 +117,7 @@ function getText(reply, fileName, userId) {
     
                           let obj = {
                             itemName: data[0],
-                            quantity: Number(angka),
-                            Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                            quantity: Number(angka)
                           }
     
                           hasil.push(obj)
@@ -132,8 +126,7 @@ function getText(reply, fileName, userId) {
               } else {
                   let obj = {
                     itemName: data[0] + ' ' + data[1],
-                    quantity: Number(data[2]),
-                    Total: Number(data[3].split('.').join(''))
+                    quantity: Number(data[2])
                   }
     
                   hasil.push(obj)
@@ -143,8 +136,7 @@ function getText(reply, fileName, userId) {
                   if (data.length >= 3) {
                     let obj = {
                       itemName: data[0],
-                      quantity: Number(data[1]),
-                      Total: Number(data[2].split('.').join(''))
+                      quantity: Number(data[1])
                     }
       
                     hasil.push(obj)
@@ -152,8 +144,7 @@ function getText(reply, fileName, userId) {
                       if (splitted[index + 2][1] === ' ') {
                         let obj = {
                           itemName: data[0],
-                          quantity: Number(splitted[index + 2][0]),
-                          Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                          quantity: Number(splitted[index + 2][0])
                         }
     
                         hasil.push(obj)
@@ -162,8 +153,7 @@ function getText(reply, fileName, userId) {
     
                           let obj = {
                             itemName: data[0],
-                            quantity: Number(angka),
-                            Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                            quantity: Number(angka)
                           }
     
                           hasil.push(obj)
@@ -173,8 +163,7 @@ function getText(reply, fileName, userId) {
                     if (data.length >= 3) {
                       let obj = {
                         itemName: data[0],
-                        quantity: Number(data[1]),
-                        Total: Number(data[2].split('.').join(''))
+                        quantity: Number(data[1])
                       }
         
                       hasil.push(obj)
@@ -182,8 +171,7 @@ function getText(reply, fileName, userId) {
                         if (splitted[index + 2][1] === ' ') {
                           let obj = {
                             itemName: data[0],
-                            quantity: Number(splitted[index + 2][0]),
-                            Total: Number(splitted[index + 2].slice(2).split('.').join(''))
+                            quantity: Number(splitted[index + 2][0])
                           }
     
                           hasil.push(obj)
@@ -192,8 +180,7 @@ function getText(reply, fileName, userId) {
     
                             let obj = {
                               itemName: data[0],
-                              quantity: Number(angka),
-                              Total: Number(splitted[index + 2].slice(3).split('.').join(''))
+                              quantity: Number(angka)
                             }
     
                             hasil.push(obj)
@@ -202,8 +189,7 @@ function getText(reply, fileName, userId) {
                 } else {
                     let obj = {
                       itemName: data[0],
-                      quantity: Number(data[1]),
-                      Total: Number(data[2].split('.').join(''))
+                      quantity: Number(data[1])
                     }
       
                     hasil.push(obj)
@@ -221,9 +207,9 @@ function getText(reply, fileName, userId) {
               .then(() => {
                 reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
                 reply(`Atau anda dapat mengetik report manual dengan format\n
-                /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+                /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
                 contoh:
-                /report dada 2 30.000, sayap 2 20.000`)
+                /report dada 2, sayap 2`)
               })
           })
       })
@@ -233,9 +219,9 @@ function getText(reply, fileName, userId) {
           .then(() => {
             reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
             reply(`Atau anda dapat mengetik report manual dengan format\n
-            /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+            /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
             contoh:
-            /report dada 2 30.000, sayap 2 20.000`)
+            /report dada 2, sayap 2`)
           })
       })
 }
@@ -243,7 +229,7 @@ function getText(reply, fileName, userId) {
 function checkNull(hasil, userId, reply) {
   return new Promise((resolve, reject) => {
     hasil.forEach(item => {
-      if (item.quantity == null || item.quantity == NaN || item.Total == null || item.Total == NaN) {
+      if (item.quantity == null || item.quantity == NaN) {
         reject ('Null detected')
       }
     })
@@ -257,14 +243,12 @@ async function sendToServer(hasil, reply, userId) {
                   .then(() => {
                     reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
                       .then( () => {
-                        let total = 0
                         let product = `Saved report today : `
                         hasil.forEach(element => {
-                          total += Number(element.Total)
-                          product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+                          product += `\n${element.itemName} = ${element.quantity} pcs`
                         })
 
-                        reply(`${product}\ntotal : Rp.${total.toLocaleString()}`)
+                        reply(`${product}`)
                       })
                       .catch(err => {
                         console.log(err)
@@ -276,7 +260,7 @@ async function sendToServer(hasil, reply, userId) {
 }
 
 bot.start((ctx) => {
-  ctx.reply('Selamat datang di applikasi FraAport! Ketik /help untuk bantuan, pastikan anda telah terdaftar sebagai agent kami!')
+  ctx.reply('Selamat datang di applikasi omZetBot! Ketik /help untuk bantuan, pastikan anda telah terdaftar sebagai agent kami!')
 })
 
 bot.help((ctx) => {
@@ -391,9 +375,9 @@ bot.action('harga', (ctx) => {
 
 bot.action('report', ctx => {
   ctx.editMessageText(`Format report manual:\n
-  /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+  /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
   contoh:
-  /report dada 2 30.000, sayap 2 20.000`)
+  /report dada 2, sayap 2`)
 })
 
 bot.action('myReport', (ctx) => {
@@ -446,23 +430,19 @@ bot.hears(/report (.+)/, (ctx) => {
               if (!Number(data[1])) {
                 let obj = {
                   itemName: data[0] + ' ' + data[1],
-                  quantity: data[2] ? Number(data[2]) : null,
-                  Total: data[3] ? Number(data[3].split('.').join('')) : null
+                  quantity: data[2] ? Number(data[2]) : null
                 }
 
                 hasil.push(obj)
               } else if (!Number(data[0])) {
                   let obj = {
                     itemName: data[0],
-                    quantity: data[1] ? Number(data[1]) : null,
-                    Total: data[2] ? Number(data[2].split('.').join('')) : null
+                    quantity: data[1] ? Number(data[1]) : null
                   }
 
                   hasil.push(obj)
               }
             })
-
-            hasil.forEach(item => item.itemName = item.itemName.toLowerCase())
 
             checkNull(hasil, userId, reply)
               .then(a => {
@@ -470,9 +450,9 @@ bot.hears(/report (.+)/, (ctx) => {
               })
               .catch(err => {
                 ctx.reply(`Atau anda dapat mengetik report manual dengan format\n
-                /report [nama barang]<spasi>[quantity]<spasi>[total harga]<koma>[nama barang]<spasi>[quantity]<spasi>[total harga]\n
+                /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
                 contoh:
-                /report dada 2 30.000, sayap 2 20.000`)
+                /report dada 2, sayap 2`)
               })
           } else {
               reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
