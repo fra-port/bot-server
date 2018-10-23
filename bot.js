@@ -62,7 +62,7 @@ function getText(reply, fileName, userId) {
       .then(results => {
         const text = results[0].fullTextAnnotation.text
         const splitted = text.split('\n')
-        console.log(splitted)
+
         let hasil = []
 
         splitted.forEach((split, index) => {
@@ -106,20 +106,35 @@ function getText(reply, fileName, userId) {
             }
         })
 
-        console.log(hasil)
-        checkNull(hasil, userId, reply)
-          .then(a => {
-            sendToServer(hasil, reply, userId)
+        let final = []
+
+        axios.get(`${server}/items`)
+          .then(response => {
+            response.data.result.forEach(menu => {
+              hasil.forEach(datum => {
+                if (menu.itemName.toLowerCase() === datum.itemName.toLowerCase()) {
+                  final.push(datum)
+                }
+              })
+            })
+            
+            checkNull(final, userId, reply)
+              .then(a => {
+                sendToServer(final, reply, userId)
+              })
+              .catch(err => {
+                reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+                  .then(() => {
+                    reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+                    reply(`Atau anda dapat mengetik report manual dengan format\n
+                    /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
+                    contoh:
+                    /report dada 2, sayap 2`)
+                  })
+              })
           })
           .catch(err => {
-            reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-              .then(() => {
-                reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-                reply(`Atau anda dapat mengetik report manual dengan format\n
-                /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-                contoh:
-                /report dada 2, sayap 2`)
-              })
+            console.log('error')
           })
       })
       .catch(err => {
