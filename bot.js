@@ -118,7 +118,10 @@ function getText(reply, fileName, userId) {
             })
           })
 
-          checkNull(final, userId, reply)
+          if (final.length === 0) {
+            reply('Menu yang anda masukkan tidak terdaftar!')
+          } else {
+            checkNull(final, userId, reply)
             .then(a => {
               sendToServer(final, reply, userId)
             })
@@ -132,6 +135,7 @@ contoh:
 /report dada 2, sayap 2`)
                 })
             })
+          }
         })
         .catch(err => {
           console.log('error')
@@ -256,15 +260,24 @@ bot.command('myReport', (ctx) => {
     .then(response => {
       axios.get(`${server}/selling/telegram/${userId}`)
         .then(({ data }) => {
-          data.forEach(item => {
-            let total = 0
-            let product = `List item sold ${item.createdAt.toString().slice(0, 10)}`
-            item.selling.forEach(element => {
-              total += Number(element.Total)
-              product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+          if (data.length === 0) {
+            ctx.editMessageText(`Anda belum memiliki report!`)
+          } else {
+            data.forEach((item, index) => {
+              let total = 0
+              let product = `List item sold ${item.createdAt.toString().slice(0, 10)}`
+              item.selling.forEach(element => {
+                total += Number(element.Total)
+                product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+              });
+  
+              if (index === data.length - 1) {
+                ctx.editMessageText(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+              } else {
+                ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+              }
             });
-            ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
-          });
+          }
         })
         .catch(err => {
           console.log(err)
@@ -313,20 +326,24 @@ bot.action('myReport', (ctx) => {
     .then(response => {
       axios.get(`${server}/selling/telegram/${userId}`)
         .then(({ data }) => {
-          data.forEach((item, index) => {
-            let total = 0
-            let product = `List item sold ${item.createdAt.toString().slice(0, 10)}`
-            item.selling.forEach(element => {
-              total += Number(element.Total)
-              product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+          if (data.length === 0) {
+            ctx.editMessageText(`Anda belum memiliki report!`)
+          } else {
+            data.forEach((item, index) => {
+              let total = 0
+              let product = `List item sold ${item.createdAt.toString().slice(0, 10)}`
+              item.selling.forEach(element => {
+                total += Number(element.Total)
+                product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
+              });
+  
+              if (index === data.length - 1) {
+                ctx.editMessageText(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+              } else {
+                ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+              }
             });
-
-            if (index === data.length - 1) {
-              ctx.editMessageText(`${product} \nTotal : Rp.${total.toLocaleString()}`)
-            } else {
-              ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
-            }
-          });
+          }
         })
         .catch(err => {
           console.log(err)
@@ -382,8 +399,11 @@ bot.hears(/report (.+)/, (ctx) => {
                     }
                   })
                 })
-
-                checkNull(final, userId, reply)
+      
+                if (final.length === 0) {
+                  reply('Menu yang anda masukkan tidak terdaftar!')
+                } else {
+                  checkNull(final, userId, reply)
                   .then(a => {
                     sendToServer(final, reply, userId)
                   })
@@ -392,16 +412,16 @@ bot.hears(/report (.+)/, (ctx) => {
                       .then(() => {
                         reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
                         reply(`Atau anda dapat mengetik report manual dengan format\n
-/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-contoh:
-/report dada 2, sayap 2`)
+      /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
+      contoh:
+      /report dada 2, sayap 2`)
                       })
                   })
+                }
               })
               .catch(err => {
                 console.log('error')
               })
-
           } else {
             reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
           }
