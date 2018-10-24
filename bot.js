@@ -48,10 +48,10 @@ function uploadImage(reply, userId) {
   const localReadStream = fs.createReadStream('test.jpg');
   const fileName = String(Date.now())
   const remoteWriteStream = bucket.file(fileName + '.jpg').createWriteStream();
-  
+
   localReadStream.pipe(remoteWriteStream)
-    .on('error', function(err) {})
-    .on('finish', function() {
+    .on('error', function (err) { })
+    .on('finish', function () {
       getText(reply, fileName, userId)
     });
 }
@@ -59,101 +59,101 @@ function uploadImage(reply, userId) {
 function getText(reply, fileName, userId) {
   client
     .documentTextDetection(`gs://${process.env.BUCKET_NAME}/${fileName}.jpg`)
-      .then(results => {
-        const text = results[0].fullTextAnnotation.text
-        const splitted = text.split('\n')
+    .then(results => {
+      const text = results[0].fullTextAnnotation.text
+      const splitted = text.split('\n')
 
-        let hasil = []
+      let hasil = []
 
-        splitted.forEach((split, index) => {
-          let data = split.split(' ')
+      splitted.forEach((split, index) => {
+        let data = split.split(' ')
 
-            if (!Number(data[1]) && data[1]) {
-              if (data[1].length === 1 || data[1].length === 2) {
-                if (data[1][0] === '|' || data[1][0] === 'I' || data[1][0] === 'l') {
-                  data[1] = data[1].length === 1 ? '1' : '1' + data[1][1]
-                }
-
-                if (data[1][0] === 's' || data[1][0] === 'S') {
-                  data[1] = data[1].length === 1 ? '5' : '5' + data[1][1]
-                }
-
-                if (data[1][0] === 'g' || data[1][0] === 'G') {
-                  data[1] = data[1].length === 1 ? '6' : '6' + data[1][1]
-                }
-
-                let obj = {
-                  itemName: data[0],
-                  quantity: Number(data[1])
-                }
-  
-                hasil.push(obj)
-              } else {
-                let obj = {
-                  itemName: data[0] + ' ' + data[1],
-                  quantity: Number(data[2])
-                }
-  
-                hasil.push(obj)
-              }
-            } else if (!Number(data[0]) && data[0]) {
-                let obj = {
-                  itemName: data[0],
-                  quantity: Number(data[1])
-                }
-  
-                hasil.push(obj)
+        if (!Number(data[1]) && data[1]) {
+          if (data[1].length === 1 || data[1].length === 2) {
+            if (data[1][0] === '|' || data[1][0] === 'I' || data[1][0] === 'l') {
+              data[1] = data[1].length === 1 ? '1' : '1' + data[1][1]
             }
-        })
 
-        let final = []
+            if (data[1][0] === 's' || data[1][0] === 'S') {
+              data[1] = data[1].length === 1 ? '5' : '5' + data[1][1]
+            }
 
-        axios.get(`${server}/items`)
-          .then(response => {
-            response.data.result.forEach(menu => {
-              hasil.forEach(datum => {
-                if (menu.itemName.toLowerCase() === datum.itemName.toLowerCase()) {
-                  final.push(datum)
-                }
-              })
+            if (data[1][0] === 'g' || data[1][0] === 'G') {
+              data[1] = data[1].length === 1 ? '6' : '6' + data[1][1]
+            }
+
+            let obj = {
+              itemName: data[0],
+              quantity: Number(data[1])
+            }
+
+            hasil.push(obj)
+          } else {
+            let obj = {
+              itemName: data[0] + ' ' + data[1],
+              quantity: Number(data[2])
+            }
+
+            hasil.push(obj)
+          }
+        } else if (!Number(data[0]) && data[0]) {
+          let obj = {
+            itemName: data[0],
+            quantity: Number(data[1])
+          }
+
+          hasil.push(obj)
+        }
+      })
+
+      let final = []
+
+      axios.get(`${server}/items`)
+        .then(response => {
+          response.data.result.forEach(menu => {
+            hasil.forEach(datum => {
+              if (menu.itemName.toLowerCase() === datum.itemName.toLowerCase()) {
+                final.push(datum)
+              }
             })
-            
-            checkNull(final, userId, reply)
-              .then(a => {
-                sendToServer(final, reply, userId)
-              })
-              .catch(err => {
-                reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-                  .then(() => {
-                    reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-                    reply(`Atau anda dapat mengetik report manual dengan format\n
-                    /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-                    contoh:
-                    /report dada 2, sayap 2`)
-                  })
-              })
           })
-          .catch(err => {
-            console.log('error')
-          })
-      })
-      .catch(err => {
-        reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-          .then(() => {
-            reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-            reply(`Atau anda dapat mengetik report manual dengan format\n
-            /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-            contoh:
-            /report dada 2, sayap 2`)
-          })
-      })
+
+          checkNull(final, userId, reply)
+            .then(a => {
+              sendToServer(final, reply, userId)
+            })
+            .catch(err => {
+              reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+                .then(() => {
+                  reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+                  reply(`Atau anda dapat mengetik report manual dengan format\n
+/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
+contoh:
+/report dada 2, sayap 2`)
+                })
+            })
+        })
+        .catch(err => {
+          console.log('error')
+        })
+    })
+    .catch(err => {
+      reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+        .then(() => {
+          reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+          reply(`Atau anda dapat mengetik report manual dengan format\n
+/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
+contoh:
+/report dada 2, sayap 2`)
+        })
+    })
 }
 
 function checkNull(hasil, userId, reply) {
   return new Promise((resolve, reject) => {
     hasil.forEach(item => {
       if (item.quantity == null || isNaN(item.quantity)) {
-        reject ('Null detected')
+        reject('Null detected')
       }
     })
 
@@ -163,23 +163,23 @@ function checkNull(hasil, userId, reply) {
 
 async function sendToServer(hasil, reply, userId) {
   let a = await axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
-                  .then(() => {
-                    reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
-                      .then( () => {
-                        let product = `Saved report today : `
-                        hasil.forEach(element => {
-                          product += `\n${element.itemName} = ${element.quantity} pcs`
-                        })
+    .then(() => {
+      reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
+        .then(() => {
+          let product = `Saved report today : `
+          hasil.forEach(element => {
+            product += `\n${element.itemName} = ${element.quantity} pcs`
+          })
 
-                        reply(`${product}`)
-                      })
-                      .catch(err => {
-                        console.log(err)
-                      })
-                  })
-                  .catch(err => {
-                    console.log(err)
-                  })
+          reply(`${product}`)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    })
+    .catch(err => {
+      console.log(err)
+    })
 }
 
 bot.start((ctx) => {
@@ -200,7 +200,7 @@ bot.help((ctx) => {
   )
 })
 
-bot.on('photo', ({message, reply}) => {
+bot.on('photo', ({ message, reply }) => {
   let userId = message.from.id
 
   reply(`${emoji.get('oncoming_automobile')} Sedang menyimpan report.......`)
@@ -212,19 +212,19 @@ bot.on('photo', ({message, reply}) => {
           if (!response.data.result) {
             telegram.getFileLink(message.photo.pop().file_id)
               .then(async (link) => {
-                let image = await axios.get(link, { responseType:"stream" })
-                                    .then(data => {
-                                      const img = data.data
-                                      downloadImage(img, reply, userId)
-                                    })
+                let image = await axios.get(link, { responseType: "stream" })
+                  .then(data => {
+                    const img = data.data
+                    downloadImage(img, reply, userId)
+                  })
               })
               .catch(error => {
                 console.log(err)
               })
           } else {
-              reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
+            reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
           }
-        }) 
+        })
     })
     .catch(err => {
       reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
@@ -273,6 +273,7 @@ bot.command('myReport', (ctx) => {
     .catch(err => {
       ctx.reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
     })
+
 })
 
 bot.action('myId', (ctx) => {
@@ -280,6 +281,7 @@ bot.action('myId', (ctx) => {
 })
 
 bot.action('harga', (ctx) => {
+
   axios.get(`${server}/items`)
     .then(response => {
       response.data.result.forEach((menu, index) => {
@@ -294,6 +296,7 @@ bot.action('harga', (ctx) => {
     .catch(err => {
       console.log('error')
     })
+
 })
 
 bot.action('report', ctx => {
@@ -317,7 +320,7 @@ bot.action('myReport', (ctx) => {
               total += Number(element.Total)
               product += `\n${element.itemName} = ${element.quantity} pcs = Rp.${element.Total.toLocaleString()}`
             });
-            
+
             if (index === data.length - 1) {
               ctx.editMessageText(`${product} \nTotal : Rp.${total.toLocaleString()}`)
             } else {
@@ -334,6 +337,7 @@ bot.action('myReport', (ctx) => {
     })
 })
 
+
 bot.hears(/report (.+)/, (ctx) => {
   let reply = ctx.reply
   let userId = ctx.message.from.id
@@ -349,7 +353,7 @@ bot.hears(/report (.+)/, (ctx) => {
           if (!response.data.result) {
             splitted.forEach(item => {
               let data = item.split(' ')
-              
+
               if (!Number(data[1])) {
                 let obj = {
                   itemName: data[0] + ' ' + data[1],
@@ -358,29 +362,50 @@ bot.hears(/report (.+)/, (ctx) => {
 
                 hasil.push(obj)
               } else if (!Number(data[0])) {
-                  let obj = {
-                    itemName: data[0],
-                    quantity: data[1] ? Number(data[1]) : null
-                  }
+                let obj = {
+                  itemName: data[0],
+                  quantity: data[1] ? Number(data[1]) : null
+                }
 
-                  hasil.push(obj)
+                hasil.push(obj)
               }
             })
 
-            checkNull(hasil, userId, reply)
-              .then(a => {
-                sendToServer(hasil, ctx.reply, userId)
+            let final = []
+
+            axios.get(`${server}/items`)
+              .then(response => {
+                response.data.result.forEach(menu => {
+                  hasil.forEach(datum => {
+                    if (menu.itemName.toLowerCase() === datum.itemName.toLowerCase()) {
+                      final.push(datum)
+                    }
+                  })
+                })
+
+                checkNull(final, userId, reply)
+                  .then(a => {
+                    sendToServer(final, reply, userId)
+                  })
+                  .catch(err => {
+                    reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+                      .then(() => {
+                        reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+                        reply(`Atau anda dapat mengetik report manual dengan format\n
+/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
+contoh:
+/report dada 2, sayap 2`)
+                      })
+                  })
               })
               .catch(err => {
-                ctx.reply(`Atau anda dapat mengetik report manual dengan format\n
-                /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-                contoh:
-                /report dada 2, sayap 2`)
+                console.log('error')
               })
+
           } else {
-              reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
+            reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
           }
-        }) 
+        })
     })
     .catch(err => {
       reply(`${emoji.get('x')} Anda belum terdaftar! Silahkan hubungi admin!`)
