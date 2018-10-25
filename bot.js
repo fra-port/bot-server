@@ -38,6 +38,8 @@ new CronJob('0 30 18 * * *', () => {
     })
 }, null, true, 'Asia/Jakarta')
 
+let final = []
+
 function downloadImage(img, reply, userId) {
   img.pipe(fs.createWriteStream('test.jpg'))
     .on('error', (err) => console.log(err))
@@ -106,8 +108,6 @@ function getText(reply, fileName, userId) {
         }
       })
 
-      let final = []
-
       axios.get(`${server}/items`)
         .then(response => {
           response.data.result.forEach(menu => {
@@ -118,46 +118,69 @@ function getText(reply, fileName, userId) {
             })
           })
 
-          if (final.length === 0) {
-            reply('Menu yang anda masukkan tidak terdaftar!')
-          } else {
-            checkNull(final, userId, reply)
-            .then(a => {
-              sendToServer(final, reply, userId)
-            })
-            .catch(err => {
-              reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-                .then(() => {
-                  reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-                  reply(`Atau anda dapat mengetik report manual dengan format\n
-/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-contoh:
-/report dada 2, sayap 2`)
-                })
-            })
-          }
+          let barang = ''
+          
+          final.forEach((datum, index) => {
+            if (index === final.length - 1) {
+              barang += datum.itemName + ' ' + datum.quantity
+            } else {
+              barang += datum.itemName + ' ' + datum.quantity + ',\n'
+            }
+          })
+
+          reply(`Apakah benar ini report anda?${'\n'}${barang}`,
+              Markup.inlineKeyboard([
+                  [
+                      Markup.callbackButton("Yes", 'ya'),
+                      Markup.callbackButton("No", 'nu')
+                  ]
+              ]).extra()
+          )
+
+          bot.action('ya', (ctx) => {
+            if (final.length === 0) {
+              ctx.editMessageText('Menu yang anda masukkan tidak terdaftar!')
+            } else {
+                checkNull(final, ctx.from.id, ctx)
+                  .then(a => {
+                    sendToServer(final, ctx, ctx.from.id)
+                  })
+                  .catch(err => {
+                    ctx.editMessageText(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+                      .then(() => {
+                        ctx.editMessageText('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+                        ctx.editMessageText(`Atau anda dapat mengetik report manual dengan format\n/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\nContoh:/report dada 2, sayap 2`)
+                      })
+                    final = []
+                  })
+            }
+          })
+
+          bot.action('nu', (ctx) => {
+              ctx.editMessageText('Report not saved!')
+              final = []
+          })
         })
         .catch(err => {
           console.log('error')
+          final = []
         })
     })
     .catch(err => {
       reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
         .then(() => {
           reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-          reply(`Atau anda dapat mengetik report manual dengan format\n
-/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-contoh:
-/report dada 2, sayap 2`)
+          reply(`Atau anda dapat mengetik report manual dengan format\n/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\nContoh:/report dada 2, sayap 2`)
+          final = []
         })
     })
 }
 
-function checkNull(hasil, userId, reply) {
+function checkNull(hasil, userId, ctx) {
   return new Promise((resolve, reject) => {
     hasil.forEach(item => {
       if (item.quantity == null || isNaN(item.quantity)) {
-        reject('Null detected')
+        ctx.editMessageText('Null detected')
       }
     })
 
@@ -165,17 +188,18 @@ function checkNull(hasil, userId, reply) {
   })
 }
 
-async function sendToServer(hasil, reply, userId) {
+async function sendToServer(hasil, ctx, userId) {
   let a = await axios.post(`${server}/selling`, { idTelegram: userId, item: hasil })
     .then(() => {
-      reply(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
+      ctx.editMessageText(`Report tersimpan! Terima kasih telah mengirimkan report hari ini ${emoji.get('+1')}`)
         .then(() => {
           let product = `Saved report today : `
           hasil.forEach(element => {
             product += `\n${element.itemName} = ${element.quantity} pcs`
           })
 
-          reply(`${product}`)
+          ctx.reply(`${product}`)
+          final = []
         })
         .catch(err => {
           console.log(err)
@@ -261,7 +285,7 @@ bot.command('myReport', (ctx) => {
       axios.get(`${server}/selling/telegram/${userId}`)
         .then(({ data }) => {
           if (data.length === 0) {
-            ctx.editMessageText(`Anda belum memiliki report!`)
+            ctx.reply(`Anda belum memiliki report!`)
           } else {
             data.forEach((item, index) => {
               let total = 0
@@ -272,7 +296,7 @@ bot.command('myReport', (ctx) => {
               });
   
               if (index === data.length - 1) {
-                ctx.editMessageText(`${product} \nTotal : Rp.${total.toLocaleString()}`)
+                ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
               } else {
                 ctx.reply(`${product} \nTotal : Rp.${total.toLocaleString()}`)
               }
@@ -313,10 +337,7 @@ bot.action('harga', (ctx) => {
 })
 
 bot.action('report', ctx => {
-  ctx.editMessageText(`Format report manual:\n
-  /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-  contoh:
-  /report dada 2, sayap 2`)
+  ctx.editMessageText(`Format report manual:\n/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\ncontoh:\n/report dada 2, sayap 2`)
 })
 
 bot.action('myReport', (ctx) => {
@@ -388,8 +409,6 @@ bot.hears(/report (.+)/, (ctx) => {
               }
             })
 
-            let final = []
-
             axios.get(`${server}/items`)
               .then(response => {
                 response.data.result.forEach(menu => {
@@ -399,28 +418,53 @@ bot.hears(/report (.+)/, (ctx) => {
                     }
                   })
                 })
+
+                let barang = ''
+          
+                final.forEach((datum, index) => {
+                  if (index === final.length - 1) {
+                    barang += datum.itemName + ' ' + datum.quantity
+                  } else {
+                    barang += datum.itemName + ' ' + datum.quantity + ',\n'
+                  }
+                })
       
-                if (final.length === 0) {
-                  reply('Menu yang anda masukkan tidak terdaftar!')
-                } else {
-                  checkNull(final, userId, reply)
-                  .then(a => {
-                    sendToServer(final, reply, userId)
-                  })
-                  .catch(err => {
-                    reply(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
-                      .then(() => {
-                        reply('Gunakan applikasi note pada Gadget anda untuk membuat report!')
-                        reply(`Atau anda dapat mengetik report manual dengan format\n
-      /report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\n
-      contoh:
-      /report dada 2, sayap 2`)
-                      })
-                  })
-                }
+                reply(`Apakah benar ini report anda?${'\n'}${barang}`,
+                    Markup.inlineKeyboard([
+                        [
+                            Markup.callbackButton("Yes", 'yas'),
+                            Markup.callbackButton("No", 'nus')
+                        ]
+                    ]).extra()
+                )
+                
+                bot.action('yas', (ctx) => {
+                  if (final.length === 0) {
+                    ctx.editMessageText('Menu yang anda masukkan tidak terdaftar!')
+                  } else {
+                      checkNull(final, ctx.from.id, ctx)
+                        .then(a => {
+                          sendToServer(final, ctx, ctx.from.id)
+                        })
+                        .catch(err => {
+                          ctx.editMessageText(`Gagal menyimpan report! Pastikan format sesuai dengan foto di bawah ${emoji.get('cry')}`)
+                            .then(() => {
+                              ctx.editMessageText('Gunakan applikasi note pada Gadget anda untuk membuat report!')
+                              ctx.editMessageText(`Atau anda dapat mengetik report manual dengan format\n/report [nama barang]<spasi>[quantity]<koma>[nama barang]<spasi>[quantity]\nContoh:/report dada 2, sayap 2`)
+                              final = []
+                            })
+                        })
+                  }
+                })
+      
+                bot.action('nus', (ctx) => {
+                    ctx.editMessageText('Report not saved!')
+                    final = []
+                })
               })
               .catch(err => {
                 console.log('error')
+                final = []
               })
           } else {
             reply(`Anda telah melakukan report di hari ini! ${emoji.get('+1')}`)
